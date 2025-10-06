@@ -14,7 +14,7 @@ let EmailNotificationStrategy = EmailNotificationStrategy_1 = class EmailNotific
         this.logger = new common_1.Logger(EmailNotificationStrategy_1.name);
     }
     async send(payload) {
-        this.logger.log(`[MOCK EMAIL] Sending email to ${payload.userId}`);
+        this.logger.log(`Sending email to ${payload.userId}`);
         this.logger.log(`Subject: ${payload.type}`);
         this.logger.log(`Message: ${payload.message}`);
         this.logger.log(`Metadata: ${JSON.stringify(payload.metadata)}`);
