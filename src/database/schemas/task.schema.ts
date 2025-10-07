@@ -23,6 +23,9 @@ export class Task extends Document {
 
   @Prop({ required: true })
   updatedBy: string;
+
+  @Prop({ default: false })
+  isDeleted: boolean;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

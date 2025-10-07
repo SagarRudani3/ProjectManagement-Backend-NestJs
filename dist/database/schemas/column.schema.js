@@ -39,6 +39,10 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Column.prototype, "updatedBy", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Column.prototype, "isDeleted", void 0);
 exports.Column = Column = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Column);

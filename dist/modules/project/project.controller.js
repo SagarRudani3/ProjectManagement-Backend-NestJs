@@ -24,10 +24,11 @@ let ProjectController = class ProjectController {
         this.projectService = projectService;
     }
     create(createProjectDto, user) {
-        return this.projectService.create(createProjectDto, user.email, user.isSuperUser);
+        return this.projectService.create(createProjectDto, user?.email, user?.isSuperUser);
     }
     findAll(user) {
-        return this.projectService.findAll(user.isSuperUser);
+        console.log("%c Line:21 🥖", "color:#b03734", user);
+        return this.projectService.findAll(user?.isSuperUser);
     }
     findOne(id, user) {
         return this.projectService.findOne(id, user.isSuperUser);
@@ -56,16 +57,16 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProjectController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], ProjectController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Patch)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
@@ -73,15 +74,15 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProjectController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Delete)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ProjectController.prototype, "remove", null);
 exports.ProjectController = ProjectController = __decorate([
-    (0, common_1.Controller)('projects'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Controller)("projects"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.UserJwtGard),
     __metadata("design:paramtypes", [project_service_1.ProjectService])
 ], ProjectController);
 //# sourceMappingURL=project.controller.js.map

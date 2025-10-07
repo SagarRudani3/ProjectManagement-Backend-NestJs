@@ -35,6 +35,10 @@ __decorate([
     (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], Activity.prototype, "timestamp", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Activity.prototype, "isDeleted", void 0);
 exports.Activity = Activity = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Activity);

@@ -5,9 +5,14 @@ import { Column } from '../../database/schemas/column.schema';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
 
+import { Task } from '../../database/schemas/task.schema';
+
 @Injectable()
 export class ColumnService {
-  constructor(@InjectModel(Column.name) private columnModel: Model<Column>) {}
+  constructor(
+    @InjectModel(Column.name) private columnModel: Model<Column>,
+    @InjectModel(Task.name) private taskModel: Model<Task>,
+  ) {}
 
   async create(createColumnDto: CreateColumnDto, userEmail: string, isSuperUser: boolean) {
     const column = await this.columnModel.create({
@@ -22,7 +27,7 @@ export class ColumnService {
   }
 
   async findByProject(projectId: string, isSuperUser: boolean) {
-    const columns = await this.columnModel.find({ projectId }).sort({ order: 1 });
+    const columns = await this.columnModel.find({ projectId, isDeleted: { $ne: true } }).sort({ order: 1 });
     return columns.map((col) => this.formatColumn(col, isSuperUser));
   }
 
@@ -41,10 +46,13 @@ export class ColumnService {
   }
 
   async remove(id: string) {
-    const column = await this.columnModel.findByIdAndDelete(id);
+    const column = await this.columnModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
     if (!column) {
       throw new NotFoundException('Column not found');
     }
+
+    await this.taskModel.updateMany({ columnId: id }, { isDeleted: true });
+
     return { success: true, message: 'Column deleted successfully' };
   }
 
@@ -57,6 +65,7 @@ export class ColumnService {
       projectId: column.projectId,
       createdAt: column.createdAt,
       updatedAt: column.updatedAt,
+      isDeleted: column.isDeleted,
     };
 
     if (isSuperUser) {

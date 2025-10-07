@@ -17,16 +17,29 @@ const column_module_1 = require("./modules/column/column.module");
 const user_module_1 = require("./modules/user/user.module");
 const notification_module_1 = require("./modules/notification/notification.module");
 const events_module_1 = require("./gateways/events.module");
+const core_1 = require("@nestjs/core");
+const logging_interceptor_1 = require("./logging.interceptor");
+const jwt_1 = require("@nestjs/jwt");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
+        providers: [
+            {
+                provide: core_1.APP_INTERCEPTOR,
+                useClass: logging_interceptor_1.LoggingInterceptor,
+            },
+        ],
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
-            mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/project-management'),
+            mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI),
+            jwt_1.JwtModule.register({
+                secret: process.env.JWT_SECRET,
+                signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || "7d" },
+            }),
             auth_module_1.AuthModule,
             project_module_1.ProjectModule,
             task_module_1.TaskModule,

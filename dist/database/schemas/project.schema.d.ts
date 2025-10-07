@@ -4,6 +4,7 @@ export declare class Project extends Document {
     description: string;
     createdBy: string;
     updatedBy: string;
+    isDeleted: boolean;
 }
 export declare const ProjectSchema: import("mongoose").Schema<Project, import("mongoose").Model<Project, any, any, any, Document<unknown, any, Project, any, {}> & Project & Required<{
     _id: unknown;

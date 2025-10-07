@@ -12,12 +12,22 @@ const mongoose_1 = require("@nestjs/mongoose");
 const column_controller_1 = require("./column.controller");
 const column_service_1 = require("./column.service");
 const column_schema_1 = require("../../database/schemas/column.schema");
+const task_schema_1 = require("../../database/schemas/task.schema");
+const auth_module_1 = require("../auth/auth.module");
+const user_module_1 = require("../user/user.module");
 let ColumnModule = class ColumnModule {
 };
 exports.ColumnModule = ColumnModule;
 exports.ColumnModule = ColumnModule = __decorate([
     (0, common_1.Module)({
-        imports: [mongoose_1.MongooseModule.forFeature([{ name: column_schema_1.Column.name, schema: column_schema_1.ColumnSchema }])],
+        imports: [
+            auth_module_1.AuthModule,
+            user_module_1.UserModule,
+            mongoose_1.MongooseModule.forFeature([
+                { name: column_schema_1.Column.name, schema: column_schema_1.ColumnSchema },
+                { name: task_schema_1.Task.name, schema: task_schema_1.TaskSchema },
+            ]),
+        ],
         controllers: [column_controller_1.ColumnController],
         providers: [column_service_1.ColumnService],
     })

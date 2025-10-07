@@ -17,9 +17,11 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const column_schema_1 = require("../../database/schemas/column.schema");
+const task_schema_1 = require("../../database/schemas/task.schema");
 let ColumnService = class ColumnService {
-    constructor(columnModel) {
+    constructor(columnModel, taskModel) {
         this.columnModel = columnModel;
+        this.taskModel = taskModel;
     }
     async create(createColumnDto, userEmail, isSuperUser) {
         const column = await this.columnModel.create({
@@ -32,7 +34,7 @@ let ColumnService = class ColumnService {
         return this.formatColumn(column, isSuperUser);
     }
     async findByProject(projectId, isSuperUser) {
-        const columns = await this.columnModel.find({ projectId }).sort({ order: 1 });
+        const columns = await this.columnModel.find({ projectId, isDeleted: { $ne: true } }).sort({ order: 1 });
         return columns.map((col) => this.formatColumn(col, isSuperUser));
     }
     async update(id, updateColumnDto, userEmail, isSuperUser) {
@@ -43,10 +45,11 @@ let ColumnService = class ColumnService {
         return this.formatColumn(column, isSuperUser);
     }
     async remove(id) {
-        const column = await this.columnModel.findByIdAndDelete(id);
+        const column = await this.columnModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
         if (!column) {
             throw new common_1.NotFoundException('Column not found');
         }
+        await this.taskModel.updateMany({ columnId: id }, { isDeleted: true });
         return { success: true, message: 'Column deleted successfully' };
     }
     formatColumn(column, isSuperUser) {
@@ -58,6 +61,7 @@ let ColumnService = class ColumnService {
             projectId: column.projectId,
             createdAt: column.createdAt,
             updatedAt: column.updatedAt,
+            isDeleted: column.isDeleted,
         };
         if (isSuperUser) {
             formatted.createdBy = column.createdBy;
@@ -70,6 +74,8 @@ exports.ColumnService = ColumnService;
 exports.ColumnService = ColumnService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(column_schema_1.Column.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)(task_schema_1.Task.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model])
 ], ColumnService);
 //# sourceMappingURL=column.service.js.map

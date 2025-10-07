@@ -15,6 +15,8 @@ const task_schema_1 = require("../../database/schemas/task.schema");
 const column_schema_1 = require("../../database/schemas/column.schema");
 const activity_schema_1 = require("../../database/schemas/activity.schema");
 const events_module_1 = require("../../gateways/events.module");
+const auth_module_1 = require("../auth/auth.module");
+const user_module_1 = require("../user/user.module");
 let TaskModule = class TaskModule {
 };
 exports.TaskModule = TaskModule;
@@ -27,9 +29,12 @@ exports.TaskModule = TaskModule = __decorate([
                 { name: activity_schema_1.Activity.name, schema: activity_schema_1.ActivitySchema },
             ]),
             events_module_1.EventsModule,
+            auth_module_1.AuthModule,
+            user_module_1.UserModule,
         ],
         controllers: [task_controller_1.TaskController],
         providers: [task_service_1.TaskService],
+        exports: [mongoose_1.MongooseModule],
     })
 ], TaskModule);
 //# sourceMappingURL=task.module.js.map

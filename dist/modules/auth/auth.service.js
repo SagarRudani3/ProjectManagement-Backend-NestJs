@@ -51,7 +51,10 @@ let AuthService = class AuthService {
         };
     }
     async validateUser(userId) {
-        return await this.userModel.findById(userId);
+        return await this.userModel.findOne({
+            _id: userId,
+            $or: [{ isDeleted: { $exists: false } }, { isDeleted: false }]
+        }).exec();
     }
 };
 exports.AuthService = AuthService;

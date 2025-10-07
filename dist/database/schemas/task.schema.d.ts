@@ -7,6 +7,7 @@ export declare class Task extends Document {
     order: number;
     createdBy: string;
     updatedBy: string;
+    isDeleted: boolean;
 }
 export declare const TaskSchema: import("mongoose").Schema<Task, import("mongoose").Model<Task, any, any, any, Document<unknown, any, Task, any, {}> & Task & Required<{
     _id: unknown;

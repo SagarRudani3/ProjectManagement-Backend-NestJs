@@ -20,7 +20,7 @@ export class TaskService {
   ) {}
 
   async create(createTaskDto: CreateTaskDto, userEmail: string, isSuperUser: boolean) {
-    const tasksInColumn = await this.taskModel.countDocuments({ columnId: createTaskDto.columnId });
+    const tasksInColumn = await this.taskModel.countDocuments({ columnId: createTaskDto.columnId, isDeleted: { $ne: true } });
 
     const taskData = TaskFactory.createTask({
       ...createTaskDto,
@@ -49,18 +49,18 @@ export class TaskService {
   }
 
   async findAll(projectId: string, isSuperUser: boolean) {
-    const tasks = await this.taskModel.find({ projectId }).sort({ order: 1 });
+    const tasks = await this.taskModel.find({ projectId, isDeleted: { $ne: true } }).sort({ order: 1 });
     return tasks.map((task) => this.formatTask(task, isSuperUser));
   }
 
   async findByColumn(columnId: string, isSuperUser: boolean) {
-    const tasks = await this.taskModel.find({ columnId }).sort({ order: 1 });
+    const tasks = await this.taskModel.find({ columnId, isDeleted: { $ne: true } }).sort({ order: 1 });
     return tasks.map((task) => this.formatTask(task, isSuperUser));
   }
 
   async findOne(id: string, isSuperUser: boolean) {
     const task = await this.taskModel.findById(id);
-    if (!task) {
+    if (!task || task.isDeleted) {
       throw new NotFoundException('Task not found');
     }
     return this.formatTask(task, isSuperUser);
@@ -123,13 +123,12 @@ export class TaskService {
   }
 
   async remove(id: string) {
-    const task = await this.taskModel.findById(id);
+    const task = await this.taskModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
     if (!task) {
       throw new NotFoundException('Task not found');
     }
 
     await this.columnModel.findByIdAndUpdate(task.columnId, { $inc: { taskCount: -1 } });
-    await this.taskModel.findByIdAndDelete(id);
 
     return { success: true, message: 'Task deleted successfully' };
   }
@@ -144,6 +143,7 @@ export class TaskService {
       order: task.order,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
+      isDeleted: task.isDeleted,
     };
 
     if (isSuperUser) {

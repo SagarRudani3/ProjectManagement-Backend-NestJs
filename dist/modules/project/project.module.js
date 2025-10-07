@@ -14,6 +14,8 @@ const project_service_1 = require("./project.service");
 const project_schema_1 = require("../../database/schemas/project.schema");
 const column_schema_1 = require("../../database/schemas/column.schema");
 const task_schema_1 = require("../../database/schemas/task.schema");
+const auth_module_1 = require("../auth/auth.module");
+const user_module_1 = require("../user/user.module");
 let ProjectModule = class ProjectModule {
 };
 exports.ProjectModule = ProjectModule;
@@ -25,6 +27,8 @@ exports.ProjectModule = ProjectModule = __decorate([
                 { name: column_schema_1.Column.name, schema: column_schema_1.ColumnSchema },
                 { name: task_schema_1.Task.name, schema: task_schema_1.TaskSchema },
             ]),
+            auth_module_1.AuthModule,
+            user_module_1.UserModule,
         ],
         controllers: [project_controller_1.ProjectController],
         providers: [project_service_1.ProjectService],

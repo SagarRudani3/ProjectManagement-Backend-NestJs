@@ -31,6 +31,10 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Project.prototype, "updatedBy", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], Project.prototype, "isDeleted", void 0);
 exports.Project = Project = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Project);

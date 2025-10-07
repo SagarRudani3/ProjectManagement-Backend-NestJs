@@ -5,6 +5,7 @@ export declare class Activity extends Document {
     userId: string;
     action: string;
     timestamp: Date;
+    isDeleted: boolean;
 }
 export declare const ActivitySchema: import("mongoose").Schema<Activity, import("mongoose").Model<Activity, any, any, any, Document<unknown, any, Activity, any, {}> & Activity & Required<{
     _id: unknown;

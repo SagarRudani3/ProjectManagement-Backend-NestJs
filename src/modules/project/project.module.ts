@@ -5,6 +5,8 @@ import { ProjectService } from './project.service';
 import { Project, ProjectSchema } from '../../database/schemas/project.schema';
 import { Column, ColumnSchema } from '../../database/schemas/column.schema';
 import { Task, TaskSchema } from '../../database/schemas/task.schema';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { Task, TaskSchema } from '../../database/schemas/task.schema';
       { name: Column.name, schema: ColumnSchema },
       { name: Task.name, schema: TaskSchema },
     ]),
+    AuthModule,
+    UserModule,
   ],
   controllers: [ProjectController],
   providers: [ProjectService],

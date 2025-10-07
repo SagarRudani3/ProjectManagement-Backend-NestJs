@@ -20,11 +20,11 @@ const project_schema_1 = require("../../database/schemas/project.schema");
 const column_schema_1 = require("../../database/schemas/column.schema");
 const task_schema_1 = require("../../database/schemas/task.schema");
 const DEFAULT_COLUMNS = [
-    { name: 'Proposed', order: 1 },
-    { name: 'Todo', order: 2 },
-    { name: 'Inprogress', order: 3 },
-    { name: 'Done', order: 4 },
-    { name: 'Deployed', order: 5 },
+    { name: "Proposed", order: 1 },
+    { name: "Todo", order: 2 },
+    { name: "Inprogress", order: 3 },
+    { name: "Done", order: 4 },
+    { name: "Deployed", order: 5 },
 ];
 let ProjectService = class ProjectService {
     constructor(projectModel, columnModel, taskModel) {
@@ -38,6 +38,7 @@ let ProjectService = class ProjectService {
             createdBy: userEmail,
             updatedBy: userEmail,
         });
+        console.log("%c Line:28 🍭 project", "color:#fca650", project);
         const columns = await Promise.all(DEFAULT_COLUMNS.map((col) => this.columnModel.create({
             name: col.name,
             order: col.order,
@@ -52,23 +53,30 @@ let ProjectService = class ProjectService {
         };
     }
     async findAll(isSuperUser) {
-        const projects = await this.projectModel.find();
+        const projects = await this.projectModel.find({ isDeleted: { $ne: true } });
         const projectsWithColumns = await Promise.all(projects.map(async (project) => {
-            const columns = await this.columnModel.find({ projectId: project._id }).sort({ order: 1 });
+            const columns = await this.columnModel
+                .find({ projectId: project._id, isDeleted: { $ne: true } })
+                .sort({ order: 1 });
             return {
                 ...this.formatProject(project, isSuperUser),
                 columns: columns.map((col) => this.formatColumn(col, isSuperUser)),
             };
         }));
+        console.log("%c Line:71 🥐 projectsWithColumns", "color:#2eafb0", projectsWithColumns);
         return projectsWithColumns;
     }
     async findOne(id, isSuperUser) {
         const project = await this.projectModel.findById(id);
-        if (!project) {
-            throw new common_1.NotFoundException('Project not found');
+        if (!project || project.isDeleted) {
+            throw new common_1.NotFoundException("Project not found");
         }
-        const columns = await this.columnModel.find({ projectId: id }).sort({ order: 1 });
-        const tasks = await this.taskModel.find({ projectId: id }).sort({ order: 1 });
+        const columns = await this.columnModel
+            .find({ projectId: id, isDeleted: { $ne: true } })
+            .sort({ order: 1 });
+        const tasks = await this.taskModel
+            .find({ projectId: id, isDeleted: { $ne: true } })
+            .sort({ order: 1 });
         const columnsWithTasks = columns.map((column) => {
             const columnTasks = tasks.filter((task) => task.columnId.toString() === column._id.toString());
             return {
@@ -84,18 +92,18 @@ let ProjectService = class ProjectService {
     async update(id, updateProjectDto, userEmail, isSuperUser) {
         const project = await this.projectModel.findByIdAndUpdate(id, { ...updateProjectDto, updatedBy: userEmail }, { new: true });
         if (!project) {
-            throw new common_1.NotFoundException('Project not found');
+            throw new common_1.NotFoundException("Project not found");
         }
         return this.formatProject(project, isSuperUser);
     }
     async remove(id) {
-        const project = await this.projectModel.findByIdAndDelete(id);
+        const project = await this.projectModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
         if (!project) {
-            throw new common_1.NotFoundException('Project not found');
+            throw new common_1.NotFoundException("Project not found");
         }
-        await this.columnModel.deleteMany({ projectId: id });
-        await this.taskModel.deleteMany({ projectId: id });
-        return { success: true, message: 'Project deleted successfully' };
+        await this.columnModel.updateMany({ projectId: id }, { isDeleted: true });
+        await this.taskModel.updateMany({ projectId: id }, { isDeleted: true });
+        return { success: true, message: "Project deleted successfully" };
     }
     formatProject(project, isSuperUser) {
         const formatted = {
@@ -104,6 +112,7 @@ let ProjectService = class ProjectService {
             description: project.description,
             createdAt: project.createdAt,
             updatedAt: project.updatedAt,
+            isDeleted: project.isDeleted,
         };
         if (isSuperUser) {
             formatted.createdBy = project.createdBy;
@@ -120,6 +129,7 @@ let ProjectService = class ProjectService {
             projectId: column.projectId,
             createdAt: column.createdAt,
             updatedAt: column.updatedAt,
+            isDeleted: column.isDeleted,
         };
         if (isSuperUser) {
             formatted.createdBy = column.createdBy;
@@ -137,6 +147,7 @@ let ProjectService = class ProjectService {
             order: task.order,
             createdAt: task.createdAt,
             updatedAt: task.updatedAt,
+            isDeleted: task.isDeleted,
         };
         if (isSuperUser) {
             formatted.createdBy = task.createdBy;

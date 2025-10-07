@@ -20,6 +20,9 @@ export class Column extends Document {
 
   @Prop({ required: true })
   updatedBy: string;
+
+  @Prop({ default: false })
+  isDeleted: boolean;
 }
 
 export const ColumnSchema = SchemaFactory.createForClass(Column);

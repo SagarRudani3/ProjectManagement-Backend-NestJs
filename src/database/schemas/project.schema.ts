@@ -14,6 +14,9 @@ export class Project extends Document {
 
   @Prop({ required: true })
   updatedBy: string;
+
+  @Prop({ default: false })
+  isDeleted: boolean;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

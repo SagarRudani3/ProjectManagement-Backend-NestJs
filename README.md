@@ -5,7 +5,9 @@ A complete NestJS backend system for Kanban-style project management with real-t
 ## Features
 
 ### Default Kanban Columns
+
 Every project automatically gets 5 default columns:
+
 1. **Proposed** - Ideas and proposals
 2. **Todo** - Tasks ready to start
 3. **Inprogress** - Tasks being worked on
@@ -13,6 +15,7 @@ Every project automatically gets 5 default columns:
 5. **Deployed** - Released features
 
 ### Core Functionality
+
 - Mock OTP authentication (any OTP works)
 - JWT-based authorization
 - Project and task management
@@ -33,31 +36,43 @@ Every project automatically gets 5 default columns:
 ## Design Patterns
 
 ### Factory Pattern (Task Creation)
+
 Located in `src/factories/task.factory.ts`
 
 **Purpose**: Standardizes task object creation
 
 **Benefits**:
+
 - Consistent task initialization
 - Template-based task generation (bug, feature, task)
 - Separates creation logic from business logic
 
 **Usage**:
+
 ```typescript
 TaskFactory.createTask(data);
-TaskFactory.createTaskFromTemplate('bug', columnId, projectId, order, userEmail);
+TaskFactory.createTaskFromTemplate(
+  "bug",
+  columnId,
+  projectId,
+  order,
+  userEmail
+);
 ```
 
 ### Strategy Pattern (Notifications)
+
 Located in `src/strategies/`
 
 **Purpose**: Flexible notification delivery based on user status
 
 **Strategies**:
+
 - **UI Strategy**: Real-time WebSocket notifications for active users
 - **Email Strategy**: Email notifications for offline users (mock)
 
 **Benefits**:
+
 - Easy to add new channels (SMS, Slack, etc.)
 - Runtime strategy selection
 - Open/Closed Principle compliance
@@ -65,6 +80,7 @@ Located in `src/strategies/`
 ## Database Choice: MongoDB
 
 **Why MongoDB?**
+
 1. **Flexible Schema**: Projects/tasks can have varying fields
 2. **Nested Documents**: Natural fit for hierarchical data
 3. **Rapid Development**: No migrations during development
@@ -76,7 +92,9 @@ Located in `src/strategies/`
 ### Authentication
 
 #### POST /auth/login
+
 Send OTP to email (mock - accepts any email)
+
 ```bash
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
@@ -84,16 +102,21 @@ curl -X POST http://localhost:3000/auth/login \
 ```
 
 #### POST /auth/verify
+
 Verify OTP (mock - accepts ANY OTP)
+
 ```bash
 curl -X POST http://localhost:3000/auth/verify \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","otp":"123456"}'
 ```
+
 Returns JWT token.
 
 #### GET /auth/me
+
 Get current user info (protected)
+
 ```bash
 curl http://localhost:3000/auth/me \
   -H "Authorization: Bearer <token>"
@@ -102,7 +125,9 @@ curl http://localhost:3000/auth/me \
 ### User Management
 
 #### POST /user/toggle-super-user
+
 Toggle super-user mode (password: `admin123`)
+
 ```bash
 curl -X POST http://localhost:3000/user/toggle-super-user \
   -H "Content-Type: application/json" \
@@ -116,7 +141,9 @@ When OFF: Hides user metadata
 ### Projects
 
 #### POST /projects
+
 Create project (automatically creates 5 default columns)
+
 ```bash
 curl -X POST http://localhost:3000/projects \
   -H "Content-Type: application/json" \
@@ -125,21 +152,27 @@ curl -X POST http://localhost:3000/projects \
 ```
 
 #### GET /projects
+
 Get all projects with columns
+
 ```bash
 curl http://localhost:3000/projects \
   -H "Authorization: Bearer <token>"
 ```
 
 #### GET /projects/:id
+
 Get single project with columns and tasks
+
 ```bash
 curl http://localhost:3000/projects/PROJECT_ID \
   -H "Authorization: Bearer <token>"
 ```
 
 #### PATCH /projects/:id
+
 Update project
+
 ```bash
 curl -X PATCH http://localhost:3000/projects/PROJECT_ID \
   -H "Content-Type: application/json" \
@@ -148,7 +181,9 @@ curl -X PATCH http://localhost:3000/projects/PROJECT_ID \
 ```
 
 #### DELETE /projects/:id
+
 Delete project (cascades to columns and tasks)
+
 ```bash
 curl -X DELETE http://localhost:3000/projects/PROJECT_ID \
   -H "Authorization: Bearer <token>"
@@ -157,7 +192,9 @@ curl -X DELETE http://localhost:3000/projects/PROJECT_ID \
 ### Columns
 
 #### POST /columns
+
 Create custom column
+
 ```bash
 curl -X POST http://localhost:3000/columns \
   -H "Content-Type: application/json" \
@@ -166,14 +203,18 @@ curl -X POST http://localhost:3000/columns \
 ```
 
 #### GET /columns?projectId=ID
+
 Get columns for project
+
 ```bash
 curl "http://localhost:3000/columns?projectId=PROJECT_ID" \
   -H "Authorization: Bearer <token>"
 ```
 
 #### PATCH /columns/:id
+
 Update column
+
 ```bash
 curl -X PATCH http://localhost:3000/columns/COLUMN_ID \
   -H "Content-Type: application/json" \
@@ -182,7 +223,9 @@ curl -X PATCH http://localhost:3000/columns/COLUMN_ID \
 ```
 
 #### DELETE /columns/:id
+
 Delete column
+
 ```bash
 curl -X DELETE http://localhost:3000/columns/COLUMN_ID \
   -H "Authorization: Bearer <token>"
@@ -191,7 +234,9 @@ curl -X DELETE http://localhost:3000/columns/COLUMN_ID \
 ### Tasks
 
 #### POST /tasks
+
 Create task
+
 ```bash
 curl -X POST http://localhost:3000/tasks \
   -H "Content-Type: application/json" \
@@ -205,28 +250,36 @@ curl -X POST http://localhost:3000/tasks \
 ```
 
 #### GET /tasks?projectId=ID
+
 Get all tasks for project
+
 ```bash
 curl "http://localhost:3000/tasks?projectId=PROJECT_ID" \
   -H "Authorization: Bearer <token>"
 ```
 
 #### GET /tasks?columnId=ID
+
 Get tasks by column
+
 ```bash
 curl "http://localhost:3000/tasks?columnId=COLUMN_ID" \
   -H "Authorization: Bearer <token>"
 ```
 
 #### GET /tasks/:id
+
 Get single task
+
 ```bash
 curl http://localhost:3000/tasks/TASK_ID \
   -H "Authorization: Bearer <token>"
 ```
 
 #### PATCH /tasks/:id
+
 Update task
+
 ```bash
 curl -X PATCH http://localhost:3000/tasks/TASK_ID \
   -H "Content-Type: application/json" \
@@ -235,7 +288,9 @@ curl -X PATCH http://localhost:3000/tasks/TASK_ID \
 ```
 
 #### PATCH /tasks/:id/move
+
 Move task to different column (triggers real-time event)
+
 ```bash
 curl -X PATCH http://localhost:3000/tasks/TASK_ID/move \
   -H "Content-Type: application/json" \
@@ -244,7 +299,9 @@ curl -X PATCH http://localhost:3000/tasks/TASK_ID/move \
 ```
 
 #### DELETE /tasks/:id
+
 Delete task
+
 ```bash
 curl -X DELETE http://localhost:3000/tasks/TASK_ID \
   -H "Authorization: Bearer <token>"
@@ -255,44 +312,45 @@ curl -X DELETE http://localhost:3000/tasks/TASK_ID \
 ### Client Connection
 
 ```javascript
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
-const socket = io('http://localhost:3000');
+const socket = io("http://localhost:3000");
 
 // Join project room
-socket.emit('join_project', 'PROJECT_ID');
+socket.emit("join_project", "PROJECT_ID");
 
 // Leave project room
-socket.emit('leave_project', 'PROJECT_ID');
+socket.emit("leave_project", "PROJECT_ID");
 ```
 
 ### Server Events (Listen)
 
 ```javascript
 // Task created
-socket.on('task_created', (task) => {
-  console.log('New task:', task);
+socket.on("task_created", (task) => {
+  console.log("New task:", task);
 });
 
 // Task updated
-socket.on('task_updated', (task) => {
-  console.log('Task updated:', task);
+socket.on("task_updated", (task) => {
+  console.log("Task updated:", task);
 });
 
 // Task moved between columns
-socket.on('task_moved', (task) => {
-  console.log('Task moved:', task);
+socket.on("task_moved", (task) => {
+  console.log("Task moved:", task);
 });
 
 // General notification
-socket.on('notification', (notification) => {
-  console.log('Notification:', notification);
+socket.on("notification", (notification) => {
+  console.log("Notification:", notification);
 });
 ```
 
 ## Database Collections
 
 ### users
+
 ```javascript
 {
   email: String (unique),
@@ -304,6 +362,7 @@ socket.on('notification', (notification) => {
 ```
 
 ### projects
+
 ```javascript
 {
   name: String,
@@ -316,6 +375,7 @@ socket.on('notification', (notification) => {
 ```
 
 ### columns
+
 ```javascript
 {
   name: String,
@@ -330,6 +390,7 @@ socket.on('notification', (notification) => {
 ```
 
 ### tasks
+
 ```javascript
 {
   title: String,
@@ -345,6 +406,7 @@ socket.on('notification', (notification) => {
 ```
 
 ### activities
+
 ```javascript
 {
   projectId: ObjectId (ref: Project),
@@ -361,7 +423,7 @@ Create `.env` file:
 
 ```env
 MONGODB_URI=mongodb://localhost:27017/project-management
-JWT_SECRET=your-secret-key-change-in-production
+JWT_SECRET=projectManagementSecretKey
 PORT=3000
 ```
 
@@ -444,6 +506,7 @@ src/
 ## Complete Workflow Example
 
 ### 1. Authenticate
+
 ```bash
 # Login
 curl -X POST http://localhost:3000/auth/login \
@@ -459,6 +522,7 @@ curl -X POST http://localhost:3000/auth/verify \
 Save the returned token.
 
 ### 2. Create Project (with default columns)
+
 ```bash
 curl -X POST http://localhost:3000/projects \
   -H "Content-Type: application/json" \
@@ -469,6 +533,7 @@ curl -X POST http://localhost:3000/projects \
 Response includes project with 5 default columns.
 
 ### 3. Create Task
+
 ```bash
 curl -X POST http://localhost:3000/tasks \
   -H "Content-Type: application/json" \
@@ -482,6 +547,7 @@ curl -X POST http://localhost:3000/tasks \
 ```
 
 ### 4. Move Task
+
 ```bash
 curl -X PATCH http://localhost:3000/tasks/<task_id>/move \
   -H "Content-Type: application/json" \
@@ -492,6 +558,7 @@ curl -X PATCH http://localhost:3000/tasks/<task_id>/move \
 Real-time event emitted to all connected clients.
 
 ### 5. Enable Super User Mode
+
 ```bash
 curl -X POST http://localhost:3000/user/toggle-super-user \
   -H "Content-Type: application/json" \
@@ -504,7 +571,9 @@ Now all responses include `createdBy` and `updatedBy` fields.
 ## Key Features Explained
 
 ### Default Columns on Project Creation
+
 When you create a project, 5 columns are automatically created:
+
 - Proposed (order: 1)
 - Todo (order: 2)
 - Inprogress (order: 3)
@@ -512,13 +581,17 @@ When you create a project, 5 columns are automatically created:
 - Deployed (order: 5)
 
 ### Task Count Tracking
+
 Each column maintains a `taskCount` field that automatically increments/decrements when tasks are added or moved.
 
 ### Real-time Updates
+
 When tasks are created, updated, or moved, Socket.IO events are emitted to all clients in the project room.
 
 ### Super User Mode
+
 Toggle between normal and admin views:
+
 - **OFF**: Clean API responses without user metadata
 - **ON**: Full transparency with creator/updater information
 

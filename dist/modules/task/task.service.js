@@ -29,7 +29,7 @@ let TaskService = class TaskService {
         this.eventsGateway = eventsGateway;
     }
     async create(createTaskDto, userEmail, isSuperUser) {
-        const tasksInColumn = await this.taskModel.countDocuments({ columnId: createTaskDto.columnId });
+        const tasksInColumn = await this.taskModel.countDocuments({ columnId: createTaskDto.columnId, isDeleted: { $ne: true } });
         const taskData = task_factory_1.TaskFactory.createTask({
             ...createTaskDto,
             columnId: new mongoose_2.Types.ObjectId(createTaskDto.columnId),
@@ -51,16 +51,16 @@ let TaskService = class TaskService {
         return formatted;
     }
     async findAll(projectId, isSuperUser) {
-        const tasks = await this.taskModel.find({ projectId }).sort({ order: 1 });
+        const tasks = await this.taskModel.find({ projectId, isDeleted: { $ne: true } }).sort({ order: 1 });
         return tasks.map((task) => this.formatTask(task, isSuperUser));
     }
     async findByColumn(columnId, isSuperUser) {
-        const tasks = await this.taskModel.find({ columnId }).sort({ order: 1 });
+        const tasks = await this.taskModel.find({ columnId, isDeleted: { $ne: true } }).sort({ order: 1 });
         return tasks.map((task) => this.formatTask(task, isSuperUser));
     }
     async findOne(id, isSuperUser) {
         const task = await this.taskModel.findById(id);
-        if (!task) {
+        if (!task || task.isDeleted) {
             throw new common_1.NotFoundException('Task not found');
         }
         return this.formatTask(task, isSuperUser);
@@ -106,12 +106,11 @@ let TaskService = class TaskService {
         return formatted;
     }
     async remove(id) {
-        const task = await this.taskModel.findById(id);
+        const task = await this.taskModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
         if (!task) {
             throw new common_1.NotFoundException('Task not found');
         }
         await this.columnModel.findByIdAndUpdate(task.columnId, { $inc: { taskCount: -1 } });
-        await this.taskModel.findByIdAndDelete(id);
         return { success: true, message: 'Task deleted successfully' };
     }
     formatTask(task, isSuperUser) {
@@ -124,6 +123,7 @@ let TaskService = class TaskService {
             order: task.order,
             createdAt: task.createdAt,
             updatedAt: task.updatedAt,
+            isDeleted: task.isDeleted,
         };
         if (isSuperUser) {
             formatted.createdBy = task.createdBy;

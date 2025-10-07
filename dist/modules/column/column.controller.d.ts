@@ -1,6 +1,6 @@
-import { ColumnService } from './column.service';
-import { CreateColumnDto } from './dto/create-column.dto';
-import { UpdateColumnDto } from './dto/update-column.dto';
+import { ColumnService } from "./column.service";
+import { CreateColumnDto } from "./dto/create-column.dto";
+import { UpdateColumnDto } from "./dto/update-column.dto";
 export declare class ColumnController {
     private readonly columnService;
     constructor(columnService: ColumnService);

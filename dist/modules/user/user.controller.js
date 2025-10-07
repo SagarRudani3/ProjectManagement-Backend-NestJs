@@ -28,7 +28,7 @@ let UserController = class UserController {
 };
 exports.UserController = UserController;
 __decorate([
-    (0, common_1.Post)('toggle-super-user'),
+    (0, common_1.Post)("toggle-super-user"),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
@@ -36,8 +36,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "toggleSuperUser", null);
 exports.UserController = UserController = __decorate([
-    (0, common_1.Controller)('user'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Controller)("user"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.UserJwtGard),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
 //# sourceMappingURL=user.controller.js.map

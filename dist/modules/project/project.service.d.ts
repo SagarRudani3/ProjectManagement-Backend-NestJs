@@ -1,9 +1,9 @@
-import { Model } from 'mongoose';
-import { Project } from '../../database/schemas/project.schema';
-import { Column } from '../../database/schemas/column.schema';
-import { Task } from '../../database/schemas/task.schema';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
+import { Model } from "mongoose";
+import { Project } from "../../database/schemas/project.schema";
+import { Column } from "../../database/schemas/column.schema";
+import { Task } from "../../database/schemas/task.schema";
+import { CreateProjectDto } from "./dto/create-project.dto";
+import { UpdateProjectDto } from "./dto/update-project.dto";
 export declare class ProjectService {
     private projectModel;
     private columnModel;

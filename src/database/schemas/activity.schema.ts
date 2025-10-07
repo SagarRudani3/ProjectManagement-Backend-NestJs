@@ -17,6 +17,9 @@ export class Activity extends Document {
 
   @Prop({ default: Date.now })
   timestamp: Date;
+
+  @Prop({ default: false })
+  isDeleted: boolean;
 }
 
 export const ActivitySchema = SchemaFactory.createForClass(Activity);
