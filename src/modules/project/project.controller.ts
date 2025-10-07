@@ -31,7 +31,7 @@ export class ProjectController {
   @Get()
   findAll(@CurrentUser() user: any) {
     console.log("%c Line:21 🥖", "color:#b03734", user);
-    return this.projectService.findAll(user?.isSuperUser);
+    return this.projectService.findAll(user);
   }
 
   @Get(":id")

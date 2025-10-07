@@ -10,7 +10,7 @@ export declare class ProjectService {
     private taskModel;
     constructor(projectModel: Model<Project>, columnModel: Model<Column>, taskModel: Model<Task>);
     create(createProjectDto: CreateProjectDto, userEmail: string, isSuperUser: boolean): Promise<any>;
-    findAll(isSuperUser: boolean): Promise<any[]>;
+    findAll(user: any): Promise<any[]>;
     findOne(id: string, isSuperUser: boolean): Promise<any>;
     update(id: string, updateProjectDto: UpdateProjectDto, userEmail: string, isSuperUser: boolean): Promise<any>;
     remove(id: string): Promise<{

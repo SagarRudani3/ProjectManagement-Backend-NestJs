@@ -54,16 +54,24 @@ export class ProjectService {
     };
   }
 
-  async findAll(isSuperUser: boolean) {
-    const projects = await this.projectModel.find({ isDeleted: { $ne: true } });
+  async findAll(user: any) {
+    let query: any = { isDeleted: { $ne: true } };
+
+    if (!user?.isSuperUser) {
+      query.createdBy = user?.email;
+    }
+
+    const projects = await this.projectModel.find(query);
     const projectsWithColumns = await Promise.all(
-      projects.map(async (project) => {
+      projects?.map(async (project) => {
         const columns = await this.columnModel
           .find({ projectId: project._id, isDeleted: { $ne: true } })
           .sort({ order: 1 });
         return {
-          ...this.formatProject(project, isSuperUser),
-          columns: columns.map((col) => this.formatColumn(col, isSuperUser)),
+          ...this.formatProject(project, user?.isSuperUser),
+          columns: columns.map((col) =>
+            this.formatColumn(col, user?.isSuperUser)
+          ),
         };
       })
     );

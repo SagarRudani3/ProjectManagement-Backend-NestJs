@@ -23,7 +23,11 @@ export class TaskController {
 
   @Post()
   create(@Body() createTaskDto: CreateTaskDto, @CurrentUser() user: any) {
-    return this.taskService.create(createTaskDto, user.email, user.isSuperUser);
+    return this.taskService.create(
+      createTaskDto,
+      user?.email,
+      user?.isSuperUser
+    );
   }
 
   @Get()
@@ -33,14 +37,14 @@ export class TaskController {
     @CurrentUser() user: any
   ) {
     if (columnId) {
-      return this.taskService.findByColumn(columnId, user.isSuperUser);
+      return this.taskService.findByColumn(columnId, user?.isSuperUser);
     }
-    return this.taskService.findAll(projectId, user.isSuperUser);
+    return this.taskService.findAll(projectId, user?.isSuperUser);
   }
 
   @Get(":id")
   findOne(@Param("id") id: string, @CurrentUser() user: any) {
-    return this.taskService.findOne(id, user.isSuperUser);
+    return this.taskService.findOne(id, user?.isSuperUser);
   }
 
   @Patch(":id")
@@ -52,8 +56,8 @@ export class TaskController {
     return this.taskService.update(
       id,
       updateTaskDto,
-      user.email,
-      user.isSuperUser
+      user?.email,
+      user?.isSuperUser
     );
   }
 
@@ -63,7 +67,12 @@ export class TaskController {
     @Body() moveTaskDto: MoveTaskDto,
     @CurrentUser() user: any
   ) {
-    return this.taskService.move(id, moveTaskDto, user.email, user.isSuperUser);
+    return this.taskService.move(
+      id,
+      moveTaskDto,
+      user?.email,
+      user?.isSuperUser
+    );
   }
 
   @Delete(":id")

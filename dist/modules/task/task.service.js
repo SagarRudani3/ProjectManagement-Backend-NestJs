@@ -1,10 +1,43 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
@@ -15,7 +48,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaskService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
+const mongoose_2 = __importStar(require("mongoose"));
 const task_schema_1 = require("../../database/schemas/task.schema");
 const column_schema_1 = require("../../database/schemas/column.schema");
 const activity_schema_1 = require("../../database/schemas/activity.schema");
@@ -29,7 +62,10 @@ let TaskService = class TaskService {
         this.eventsGateway = eventsGateway;
     }
     async create(createTaskDto, userEmail, isSuperUser) {
-        const tasksInColumn = await this.taskModel.countDocuments({ columnId: createTaskDto.columnId, isDeleted: { $ne: true } });
+        const tasksInColumn = await this.taskModel.countDocuments({
+            columnId: createTaskDto.columnId,
+            isDeleted: { $ne: true },
+        });
         const taskData = task_factory_1.TaskFactory.createTask({
             ...createTaskDto,
             columnId: new mongoose_2.Types.ObjectId(createTaskDto.columnId),
@@ -39,42 +75,54 @@ let TaskService = class TaskService {
             updatedBy: userEmail,
         });
         const task = await this.taskModel.create(taskData);
-        await this.columnModel.findByIdAndUpdate(createTaskDto.columnId, { $inc: { taskCount: 1 } });
+        await this.columnModel.findByIdAndUpdate(createTaskDto.columnId, {
+            $inc: { taskCount: 1 },
+        });
         await this.activityModel.create({
             projectId: task.projectId,
             taskId: task._id,
             userId: userEmail,
-            action: 'task_created',
+            action: "task_created",
         });
         const formatted = this.formatTask(task, isSuperUser);
         this.eventsGateway.emitTaskCreated(formatted);
         return formatted;
     }
     async findAll(projectId, isSuperUser) {
-        const tasks = await this.taskModel.find({ projectId, isDeleted: { $ne: true } }).sort({ order: 1 });
+        const tasks = await this.taskModel
+            .find({
+            projectId: new mongoose_2.default.Types.ObjectId(projectId),
+            isDeleted: { $ne: true },
+        })
+            .sort({ order: 1 });
         return tasks.map((task) => this.formatTask(task, isSuperUser));
     }
     async findByColumn(columnId, isSuperUser) {
-        const tasks = await this.taskModel.find({ columnId, isDeleted: { $ne: true } }).sort({ order: 1 });
+        const tasks = await this.taskModel
+            .find({
+            columnId: new mongoose_2.default.Types.ObjectId(columnId),
+            isDeleted: { $ne: true },
+        })
+            .sort({ order: 1 });
         return tasks.map((task) => this.formatTask(task, isSuperUser));
     }
     async findOne(id, isSuperUser) {
         const task = await this.taskModel.findById(id);
         if (!task || task.isDeleted) {
-            throw new common_1.NotFoundException('Task not found');
+            throw new common_1.NotFoundException("Task not found");
         }
         return this.formatTask(task, isSuperUser);
     }
     async update(id, updateTaskDto, userEmail, isSuperUser) {
         const task = await this.taskModel.findByIdAndUpdate(id, { ...updateTaskDto, updatedBy: userEmail }, { new: true });
         if (!task) {
-            throw new common_1.NotFoundException('Task not found');
+            throw new common_1.NotFoundException("Task not found");
         }
         await this.activityModel.create({
             projectId: task.projectId,
             taskId: task._id,
             userId: userEmail,
-            action: 'task_updated',
+            action: "task_updated",
         });
         const formatted = this.formatTask(task, isSuperUser);
         this.eventsGateway.emitTaskUpdated(formatted);
@@ -83,13 +131,17 @@ let TaskService = class TaskService {
     async move(id, moveTaskDto, userEmail, isSuperUser) {
         const task = await this.taskModel.findById(id);
         if (!task) {
-            throw new common_1.NotFoundException('Task not found');
+            throw new common_1.NotFoundException("Task not found");
         }
         const oldColumnId = task.columnId;
         const newColumnId = new mongoose_2.Types.ObjectId(moveTaskDto.columnId);
         if (oldColumnId.toString() !== newColumnId.toString()) {
-            await this.columnModel.findByIdAndUpdate(oldColumnId, { $inc: { taskCount: -1 } });
-            await this.columnModel.findByIdAndUpdate(newColumnId, { $inc: { taskCount: 1 } });
+            await this.columnModel.findByIdAndUpdate(oldColumnId, {
+                $inc: { taskCount: -1 },
+            });
+            await this.columnModel.findByIdAndUpdate(newColumnId, {
+                $inc: { taskCount: 1 },
+            });
         }
         task.columnId = newColumnId;
         task.order = moveTaskDto.order ?? task.order;
@@ -99,7 +151,7 @@ let TaskService = class TaskService {
             projectId: task.projectId,
             taskId: task._id,
             userId: userEmail,
-            action: 'task_moved',
+            action: "task_moved",
         });
         const formatted = this.formatTask(task, isSuperUser);
         this.eventsGateway.emitTaskMoved(formatted);
@@ -108,10 +160,12 @@ let TaskService = class TaskService {
     async remove(id) {
         const task = await this.taskModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
         if (!task) {
-            throw new common_1.NotFoundException('Task not found');
+            throw new common_1.NotFoundException("Task not found");
         }
-        await this.columnModel.findByIdAndUpdate(task.columnId, { $inc: { taskCount: -1 } });
-        return { success: true, message: 'Task deleted successfully' };
+        await this.columnModel.findByIdAndUpdate(task.columnId, {
+            $inc: { taskCount: -1 },
+        });
+        return { success: true, message: "Task deleted successfully" };
     }
     formatTask(task, isSuperUser) {
         const formatted = {
@@ -129,6 +183,7 @@ let TaskService = class TaskService {
             formatted.createdBy = task.createdBy;
             formatted.updatedBy = task.updatedBy;
         }
+        console.log("%c Line:194 🍷 formatted", "color:#b03734", formatted);
         return formatted;
     }
 };

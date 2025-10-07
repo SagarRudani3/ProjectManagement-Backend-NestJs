@@ -52,15 +52,19 @@ let ProjectService = class ProjectService {
             columns: columns.map((col) => this.formatColumn(col, isSuperUser)),
         };
     }
-    async findAll(isSuperUser) {
-        const projects = await this.projectModel.find({ isDeleted: { $ne: true } });
-        const projectsWithColumns = await Promise.all(projects.map(async (project) => {
+    async findAll(user) {
+        let query = { isDeleted: { $ne: true } };
+        if (!user?.isSuperUser) {
+            query.createdBy = user?.email;
+        }
+        const projects = await this.projectModel.find(query);
+        const projectsWithColumns = await Promise.all(projects?.map(async (project) => {
             const columns = await this.columnModel
                 .find({ projectId: project._id, isDeleted: { $ne: true } })
                 .sort({ order: 1 });
             return {
-                ...this.formatProject(project, isSuperUser),
-                columns: columns.map((col) => this.formatColumn(col, isSuperUser)),
+                ...this.formatProject(project, user?.isSuperUser),
+                columns: columns.map((col) => this.formatColumn(col, user?.isSuperUser)),
             };
         }));
         console.log("%c Line:71 🥐 projectsWithColumns", "color:#2eafb0", projectsWithColumns);

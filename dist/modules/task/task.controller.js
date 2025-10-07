@@ -25,22 +25,22 @@ let TaskController = class TaskController {
         this.taskService = taskService;
     }
     create(createTaskDto, user) {
-        return this.taskService.create(createTaskDto, user.email, user.isSuperUser);
+        return this.taskService.create(createTaskDto, user?.email, user?.isSuperUser);
     }
     findAll(projectId, columnId, user) {
         if (columnId) {
-            return this.taskService.findByColumn(columnId, user.isSuperUser);
+            return this.taskService.findByColumn(columnId, user?.isSuperUser);
         }
-        return this.taskService.findAll(projectId, user.isSuperUser);
+        return this.taskService.findAll(projectId, user?.isSuperUser);
     }
     findOne(id, user) {
-        return this.taskService.findOne(id, user.isSuperUser);
+        return this.taskService.findOne(id, user?.isSuperUser);
     }
     update(id, updateTaskDto, user) {
-        return this.taskService.update(id, updateTaskDto, user.email, user.isSuperUser);
+        return this.taskService.update(id, updateTaskDto, user?.email, user?.isSuperUser);
     }
     move(id, moveTaskDto, user) {
-        return this.taskService.move(id, moveTaskDto, user.email, user.isSuperUser);
+        return this.taskService.move(id, moveTaskDto, user?.email, user?.isSuperUser);
     }
     remove(id) {
         return this.taskService.remove(id);

@@ -24,13 +24,13 @@ let ColumnController = class ColumnController {
         this.columnService = columnService;
     }
     create(createColumnDto, user) {
-        return this.columnService.create(createColumnDto, user.email, user.isSuperUser);
+        return this.columnService.create(createColumnDto, user?.email, user?.isSuperUser);
     }
     findByProject(projectId, user) {
-        return this.columnService.findByProject(projectId, user.isSuperUser);
+        return this.columnService.findByProject(projectId, user?.isSuperUser);
     }
     update(id, updateColumnDto, user) {
-        return this.columnService.update(id, updateColumnDto, user.email, user.isSuperUser);
+        return this.columnService.update(id, updateColumnDto, user?.email, user?.isSuperUser);
     }
     remove(id) {
         return this.columnService.remove(id);

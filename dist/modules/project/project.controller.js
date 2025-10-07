@@ -28,7 +28,7 @@ let ProjectController = class ProjectController {
     }
     findAll(user) {
         console.log("%c Line:21 🥖", "color:#b03734", user);
-        return this.projectService.findAll(user?.isSuperUser);
+        return this.projectService.findAll(user);
     }
     findOne(id, user) {
         return this.projectService.findOne(id, user.isSuperUser);

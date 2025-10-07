@@ -24,8 +24,8 @@ export class ColumnController {
   create(@Body() createColumnDto: CreateColumnDto, @CurrentUser() user: any) {
     return this.columnService.create(
       createColumnDto,
-      user.email,
-      user.isSuperUser
+      user?.email,
+      user?.isSuperUser
     );
   }
 
@@ -34,7 +34,7 @@ export class ColumnController {
     @Query("projectId") projectId: string,
     @CurrentUser() user: any
   ) {
-    return this.columnService.findByProject(projectId, user.isSuperUser);
+    return this.columnService.findByProject(projectId, user?.isSuperUser);
   }
 
   @Patch(":id")
@@ -46,8 +46,8 @@ export class ColumnController {
     return this.columnService.update(
       id,
       updateColumnDto,
-      user.email,
-      user.isSuperUser
+      user?.email,
+      user?.isSuperUser
     );
   }
 
